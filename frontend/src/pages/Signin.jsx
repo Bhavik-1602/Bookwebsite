@@ -1,69 +1,67 @@
-import React, { useState } from 'react';
+import React from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { login } from '../store/auth'; // 👈 Import your login action
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { login } from '../store/auth';
 
 const SignIn = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // 👈 Add this line
+  const dispatch = useDispatch();
 
-  const handleSignIn = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await axios.post('http://localhost:3000/api/v1/sign-in', {
-        email,
-        password,
-      });
-      console.log('SignIn response:', response.data);
-  
-      // Store token
-      localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem("userId",response.data.id)
-      // Dispatch with correct role
-      dispatch(login({ role: response.data.role }));
-  
-      navigate('/'); // or role-based navigate
-    } catch (error) {
-      console.error('Error signing in:', error);
-      setErrorMessage(error.response?.data?.message || 'Invalid email or password');
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema: Yup.object({
+      email: Yup.string().email('Invalid email').required('Email is required'),
+      password: Yup.string().min(6, 'Min 6 characters').required('Password is required'),
+    }),
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        const res = await axios.post('http://localhost:3000/api/v1/sign-in', values);
+        toast.success('Signed in successfully!');
+
+        localStorage.setItem('authToken', res.data.token);
+        localStorage.setItem('userId', res.data.id);
+
+        dispatch(login({ role: res.data.role }));
+        navigate('/');
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Invalid email or password');
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <ToastContainer />
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
         <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Sign In</h2>
 
-        {errorMessage && (
-          <div className="mb-4 text-red-600 text-center">
-            {errorMessage}
-          </div>
-        )}
-
-        <form onSubmit={handleSignIn}>
+        <form onSubmit={formik.handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
               Email Address
             </label>
             <input
               type="email"
-              id="email"  
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="email"
+              {...formik.getFieldProps('email')}
               placeholder="Enter your email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+                formik.touched.email && formik.errors.email ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
+            {formik.touched.email && formik.errors.email && (
+              <div className="text-red-600 text-sm mt-1">{formik.errors.email}</div>
+            )}
           </div>
 
           <div className="mb-6">
@@ -73,20 +71,23 @@ const SignIn = () => {
             <input
               type="password"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...formik.getFieldProps('password')}
               placeholder="Enter your password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${
+                formik.touched.password && formik.errors.password ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
+            {formik.touched.password && formik.errors.password && (
+              <div className="text-red-600 text-sm mt-1">{formik.errors.password}</div>
+            )}
           </div>
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none"
+            disabled={formik.isSubmitting}
+            className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700"
           >
-            {loading ? 'Signing In...' : 'Sign In'}
+            {formik.isSubmitting ? 'Signing In...' : 'Sign In'}
           </button>
 
           <div className="text-center mt-4">

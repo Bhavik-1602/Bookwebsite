@@ -1,38 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import BookCard from '../components/BookCard/BookCard'; // Ensure this is the correct path for BookCard
-import Loader from '../components/Loader/Loader'; // Ensure this is the correct path for Loader
+import BookCard from '../components/BookCard/BookCard';
+import Loader from '../components/Loader/Loader';
 
 const AllBooks = () => {
-  const [Data, setData] = useState(null);
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/v1/all-books');
-        setData(response.data.books); // Adjust based on your API response structure
+        const res = await axios.get('http://localhost:3000/api/v1/all-books');
+        setBooks(res.data.books || []);
       } catch (error) {
         console.error('Error fetching books:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchBooks();
-  }, []); // Empty array ensures this runs once when the component mounts
+  }, []);
 
   return (
-    <div className='bg-zinc-900 px-4'>
-      <h4 className='text-4xl text-yellow-100'>All Books Show</h4>
+    <div className="bg-zinc-900 min-h-screen px-6 py-10">
+      <h2 className="text-3xl md:text-4xl font-bold text-yellow-100 text-center mb-10">
+        All Available Books
+      </h2>
 
-      {!Data ? (
-        <div className='flex items-center justify-center my-8'>
+      {loading ? (
+        <div className="flex items-center justify-center">
           <Loader />
         </div>
+      ) : books.length === 0 ? (
+        <div className="text-center text-zinc-400 text-lg">
+          No books available at the moment.
+        </div>
       ) : (
-        <div className='my-8 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4'>
-          {Data.map((item, i) => (
-            <div key={i}>
-              <BookCard data={item} />
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {books.map((book) => (
+            <BookCard key={book._id} data={book} />
           ))}
         </div>
       )}

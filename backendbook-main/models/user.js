@@ -1,4 +1,6 @@
-const mongoose =require("mongoose");
+const mongoose = require("mongoose");
+
+
 
 const user = new mongoose.Schema({
   username:{
@@ -42,18 +44,22 @@ const user = new mongoose.Schema({
   },
 ],
 
-cart:[{
-  type:mongoose.Types.ObjectId,
-  ref:"bookRoutes",
+  cart: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "bookRoutes",
+    },
+  ],
+  cartCount: {
+    type: Number,
+    default: 0,
+  },
+  orders: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "order",
+    },
+  ],
+}, { timestamps: true });
 
-},
-],
-orders:[{
-  type:mongoose.Types.ObjectId,
-  ref:"order",
-  
-
-},
-],
-}, {timestamps:true});
-module.exports =mongoose.model("user", user)
+module.exports = mongoose.model("user", user);

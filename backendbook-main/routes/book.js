@@ -1,26 +1,34 @@
 const router = require("express").Router();
 const Book = require("../models/book");
 const authenticateToken = require("../routes/userAuth");
+ const upload = require('../middlewares/upload'); 
 
-router.post("/add-book", authenticateToken, async (req, res) => {
+router.post('/add-book', authenticateToken, upload.single('image'), async (req, res) => {
   try {
-    const { id, role } = req.user; // ✅ now directly available
-    console.log("Decoded user:", req.user);
+    const { role } = req.user;
 
-    if ( role!== "admin") {
+    if (role !== 'admin') {
       return res.status(403).json({ message: "Access denied. Admins only." });
     }
 
+    if (!req.file) {
+      return res.status(400).json({ message: "Image file is required." });
+    }
+
+    const imageUrl = `/public/${req.file.filename}`;
+    const { title, author, price, desc, language } = req.body;
+
     const book = new Book({
-      url: req.body.url,
-      title: req.body.title,
-      author: req.body.author,
-      price: req.body.price,
-      desc: req.body.desc,
-      language: req.body.language,
-    }); 
+      url: imageUrl,
+      title,
+      author,
+      price,
+      desc,
+      language
+    });
 
     await book.save();
+
     res.status(200).json({ message: "Book added successfully" });
   } catch (error) {
     console.error("Add-book error:", error);
@@ -29,18 +37,34 @@ router.post("/add-book", authenticateToken, async (req, res) => {
 });
 
 
-router.put("/update-book", authenticateToken, async (req, res) => {
+// Route: PUT /update-book/:id
+router.put("/update-book/:id", authenticateToken, upload.single('image'), async (req, res) => {
   try {
-    const { bookid, url, title, author, price, desc, language } = req.body;
+    const bookId = req.params.id;
+    const { title, author, price, desc, language } = req.body;
 
-    console.log("Update request for bookid:", bookid);
-    console.log("New data:", { url, title, author, price, desc, language });
+    let url;
+    if (req.file) {
+      url = `/public/${req.file.filename}`;  // or your upload path pattern
+    }
 
-    const updatedBook = await Book.findByIdAndUpdate(
-      bookid,
-      { url, title, author, price, desc, language },
-      { new: true } // return updated doc
-    );
+    const updateData = {
+      title,
+      author,
+      price,
+      desc,
+      language,
+    };
+
+    // If image uploaded, update the url
+    if (url) {
+      updateData.url = url;
+    }
+
+    console.log("Update request for bookId:", bookId);
+    console.log("Update data:", updateData);
+
+    const updatedBook = await Book.findByIdAndUpdate(bookId, updateData, { new: true });
 
     if (!updatedBook) {
       return res.status(404).json({ message: "Book not found" });
@@ -52,6 +76,9 @@ router.put("/update-book", authenticateToken, async (req, res) => {
     return res.status(500).json({ message: "An error occurred" });
   }
 });
+
+
+
 
 router.delete("/delete-book", authenticateToken, async (req, res) => {
   try {
