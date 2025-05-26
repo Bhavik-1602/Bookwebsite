@@ -18,6 +18,8 @@ import { login } from './store/auth';
 import AddBook from './pages/AddBook';  // Corrected import
 import UpdateBook from './pages/UpdateBook';
 
+import Razorpay from './pages/Razorpay';
+
 const App = () => {
   const dispatch = useDispatch();
   const role = useSelector((state) => state.auth.role);
@@ -40,6 +42,7 @@ const App = () => {
           <Route path='/signin' element={<Signin />} />
           <Route path='/signup' element={<Signup />} />
           <Route path='/cart' element={<Cart />} />
+          <Route path='/razorpay' element={<Razorpay />} />
        
 <Route path="/update-book/:id" element={<UpdateBook />} />
 

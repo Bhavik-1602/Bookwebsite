@@ -3,6 +3,7 @@ import Loader from '../components/Loader/Loader';
 import { AiFillDelete } from 'react-icons/ai';
 import { FiShoppingCart, FiMinus, FiPlus } from 'react-icons/fi';
 import { HiOutlineShoppingBag } from 'react-icons/hi';
+import { BiMoney, BiCreditCard } from 'react-icons/bi';
 import axios from 'axios';
 import emty from "../assets/Empty Cart.jpeg";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +16,7 @@ const Cart = () => {
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [removingItems, setRemovingItems] = useState(new Set());
+  const [paymentMode, setPaymentMode] = useState('online'); // 'online' or 'cod'
 
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("authToken");
@@ -44,7 +46,7 @@ const Cart = () => {
     }
   }, [cart]);
 
-  const PlaceOrder = async () => {
+  const PlaceOrderCOD = async () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
@@ -52,17 +54,61 @@ const Cart = () => {
         {
           id: userId,
           order: cart,
+          paymentMode: 'COD',
+          paymentStatus: 'Pending'
+        },
+        { headers }
+      );
+
+      toast.success(response.data.message || "Order placed successfully with COD!");
+      
+      // Navigate directly to order history for COD orders
+      setTimeout(() => {
+        navigate("/profile/orderhistory");
+      }, 1500);
+      
+    } catch (error) {
+      console.error("COD Order error:", error);
+      toast.error("Failed to place COD order");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const PlaceOrderOnline = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/place-order`,
+        {
+          id: userId,
+          order: cart,
+          paymentMode: 'Online',
+          paymentStatus: 'Pending'
         },
         { headers }
       );
 
       toast.success(response.data.message || "Order placed successfully!");
-      navigate("/profile/orderHistory");
+      
+      // Store cart total in localStorage to pass to Razorpay
+      localStorage.setItem("cartTotal", total);
+      localStorage.setItem("cartItems", JSON.stringify(cart));
+      
+      navigate("/razorpay");
     } catch (error) {
-      console.error("Order error:", error);
-      toast.error("Failed to place order");
+      console.error("Online Order error:", error);
+      toast.error("Failed to place online order");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePlaceOrder = () => {
+    if (paymentMode === 'cod') {
+      PlaceOrderCOD();
+    } else {
+      PlaceOrderOnline();
     }
   };
 
@@ -236,10 +282,98 @@ const Cart = () => {
                       </div>
                     </div>
 
+                    {/* Payment Mode Selection */}
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold text-slate-800 mb-4">Payment Method</h3>
+                      <div className="space-y-3">
+                        <label className="flex items-center cursor-pointer">
+                          <input
+                            type="radio"
+                            name="paymentMode"
+                            value="online"
+                            checked={paymentMode === 'online'}
+                            onChange={(e) => setPaymentMode(e.target.value)}
+                            className="sr-only"
+                          />
+                          <div className={`flex items-center w-full p-4 rounded-xl border-2 transition-all duration-300 ${
+                            paymentMode === 'online' 
+                              ? 'border-blue-500 bg-blue-50' 
+                              : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                          }`}>
+                            <BiCreditCard className={`w-5 h-5 mr-3 ${
+                              paymentMode === 'online' ? 'text-blue-600' : 'text-slate-500'
+                            }`} />
+                            <div className="flex-1">
+                              <div className={`font-medium ${
+                                paymentMode === 'online' ? 'text-blue-800' : 'text-slate-700'
+                              }`}>
+                                Online Payment
+                              </div>
+                              <div className="text-sm text-slate-500">
+                                Pay via Razorpay (Cards, UPI, Net Banking)
+                              </div>
+                            </div>
+                            <div className={`w-4 h-4 rounded-full border-2 ${
+                              paymentMode === 'online' 
+                                ? 'border-blue-500 bg-blue-500' 
+                                : 'border-slate-300'
+                            }`}>
+                              {paymentMode === 'online' && (
+                                <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                              )}
+                            </div>
+                          </div>
+                        </label>
+
+                        <label className="flex items-center cursor-pointer">
+                          <input
+                            type="radio"
+                            name="paymentMode"
+                            value="cod"
+                            checked={paymentMode === 'cod'}
+                            onChange={(e) => setPaymentMode(e.target.value)}
+                            className="sr-only"
+                          />
+                          <div className={`flex items-center w-full p-4 rounded-xl border-2 transition-all duration-300 ${
+                            paymentMode === 'cod' 
+                              ? 'border-emerald-500 bg-emerald-50' 
+                              : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                          }`}>
+                            <BiMoney className={`w-5 h-5 mr-3 ${
+                              paymentMode === 'cod' ? 'text-emerald-600' : 'text-slate-500'
+                            }`} />
+                            <div className="flex-1">
+                              <div className={`font-medium ${
+                                paymentMode === 'cod' ? 'text-emerald-800' : 'text-slate-700'
+                              }`}>
+                                Cash on Delivery
+                              </div>
+                              <div className="text-sm text-slate-500">
+                                Pay when your order arrives
+                              </div>
+                            </div>
+                            <div className={`w-4 h-4 rounded-full border-2 ${
+                              paymentMode === 'cod' 
+                                ? 'border-emerald-500 bg-emerald-500' 
+                                : 'border-slate-300'
+                            }`}>
+                              {paymentMode === 'cod' && (
+                                <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                              )}
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+
                     <button
-                      onClick={PlaceOrder}
+                      onClick={handlePlaceOrder}
                       disabled={isLoading}
-                      className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                      className={`w-full font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
+                        paymentMode === 'cod'
+                          ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white'
+                          : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
+                      }`}
                     >
                       {isLoading ? (
                         <div className="flex items-center justify-center gap-2">
@@ -248,8 +382,17 @@ const Cart = () => {
                         </div>
                       ) : (
                         <span className="flex items-center justify-center gap-2">
-                          <HiOutlineShoppingBag className="w-5 h-5" />
-                          Place Order
+                          {paymentMode === 'cod' ? (
+                            <>
+                              <BiMoney className="w-5 h-5" />
+                              Place COD Order
+                            </>
+                          ) : (
+                            <>
+                              <BiCreditCard className="w-5 h-5" />
+                              Proceed to Payment
+                            </>
+                          )}
                         </span>
                       )}
                     </button>
