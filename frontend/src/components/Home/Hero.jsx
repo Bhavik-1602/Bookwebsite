@@ -38,10 +38,7 @@ const Hero = () => {
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13 7l5 5m0 0l-5 5m5-5H6' />
               </svg>
             </Link>
-            
-            {/* <button className='inline-flex items-center justify-center text-yellow-100 text-lg md:text-xl font-semibold border-2 border-yellow-100/50 px-8 py-4 rounded-full hover:bg-yellow-100/10 hover:border-yellow-100 transition-all duration-300 backdrop-blur-sm'>
-              Browse Categories
-            </button> */}
+    
           </div>
           
           {/* Stats */}
@@ -74,27 +71,12 @@ const Hero = () => {
                 alt="Book collection"
                 className="w-full max-w-md md:max-w-lg lg:max-w-xl object-contain filter drop-shadow-2xl group-hover:scale-105 transition-transform duration-300"
               />
-              
-              {/* Floating elements */}
-              {/* <div className='absolute -top-4 -right-4 bg-yellow-100 text-zinc-900 px-3 py-1 rounded-full text-sm font-semibold shadow-lg animate-bounce'>
-                New!
-              </div> */}
-              
-              {/* <div className='absolute -bottom-2 -left-2 bg-gradient-to-r from-amber-400 to-yellow-300 text-zinc-900 px-3 py-1 rounded-full text-sm font-semibold shadow-lg'>
-                Bestsellers
-              </div> */}
+          
             </div>
           </div>
         </div>
 
       </div>
-      
-      {/* Scroll indicator */}
-      {/* <div className='absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce'>
-        <svg className='w-6 h-6 text-yellow-100/60' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 14l-7 7m0 0l-7-7m7 7V3' />
-        </svg>
-      </div> */}
     </section>
   );
 };
