@@ -1,6 +1,7 @@
+require("dotenv").config();
 const { createRazorpayInstance } = require("../config/razorpay");
 const crypto = require("crypto");
-require("dotenv").config();
+
 
 const razorpayInstance = createRazorpayInstance();
 
