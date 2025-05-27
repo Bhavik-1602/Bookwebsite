@@ -20,10 +20,15 @@ const UpdateBook = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+
+
   useEffect(() => {
     const fetchBook = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/api/v1/all-book-byid/${id}`);
+        const res = await axios.get(`${API_BASE_URL}/api/v1/all-book-byid/${id}`);
         const book = res.data.books || res.data.book;
 
         if (book) {
@@ -36,7 +41,7 @@ const UpdateBook = () => {
           });
 
           if (book.url) {
-            const imageUrl = `http://localhost:3000${book.url.replace('/public', '')}`;
+             const imageUrl = `${API_BASE_URL}${book.url.replace('/public', '')}`;
             setImagePreview(imageUrl);
           }
         } else {
@@ -101,21 +106,23 @@ const UpdateBook = () => {
         formData.append(key, form[key]);
       });
 
-      const res = await axios.put(
-        `http://localhost:3000/api/v1/update-book/${id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
 
-      if (res.data.updatedBook && res.data.updatedBook.url) {
-        const updatedImageUrl = `http://localhost:3000${res.data.updatedBook.url.replace('/public', '')}`;
-        setImagePreview(updatedImageUrl);
-      }
+
+const res = await axios.put(
+  `${API_BASE_URL}/api/v1/update-book/${id}`,
+  formData,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  }
+);
+
+if (res.data.updatedBook && res.data.updatedBook.url) {
+  const updatedImageUrl = `${API_BASE_URL}${res.data.updatedBook.url.replace('/public', '')}`;
+  setImagePreview(updatedImageUrl);
+}
 
       toast.success('Book updated successfully!');
       setTimeout(() => navigate(`/view-book--details/${id}`), 1500);

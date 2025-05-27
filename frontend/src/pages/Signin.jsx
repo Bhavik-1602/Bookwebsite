@@ -12,6 +12,10 @@ const SignIn = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // Use environment variable for API base URL (Vite syntax)
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -23,9 +27,13 @@ const SignIn = () => {
     }),
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        const res = await axios.post('http://localhost:3000/api/v1/sign-in', values);
+        // Construct API URL using environment variables
+        const apiUrl = `${API_BASE_URL}/api/v1/sign-in`;
+        const res = await axios.post(apiUrl, values);
+        
         toast.success('Signed in successfully!');
 
+        // Store authentication data
         localStorage.setItem('authToken', res.data.token);
         localStorage.setItem('userId', res.data.id);
 

@@ -5,11 +5,12 @@ import Loader from '../Loader/Loader';
 
 const RecentlyAdded = () => {
   const [Data, setData] = useState();
+   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/v1/all-recent-books");
+        const response = await axios.get(`${API_BASE_URL}/api/v1/all-recent-books`);
         console.log("API Response: ", response.data);
         setData(response.data.books);
       } catch (error) {

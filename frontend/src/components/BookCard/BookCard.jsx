@@ -6,16 +6,21 @@ const BookCard = ({ data, favourite, onRemove }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+
+
   const handleRemoveBook = async () => {
     setIsLoading(true);
     try {
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('authToken');
-      await axios.put(
-        'http://localhost:3000/api/v1/remove-book-from-favourites',
-        { id: userId, bookid: data._id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+     await axios.put(
+  `${API_BASE_URL}/api/v1/remove-book-from-favourites`,
+  { id: userId, bookid: data._id },
+  { headers: { Authorization: `Bearer ${token}` } }
+);
       if (onRemove) onRemove(data._id);
     } catch (err) {
       console.error('Error removing book:', err.response?.data || err.message);
@@ -85,17 +90,12 @@ const BookCard = ({ data, favourite, onRemove }) => {
           </div>
         </div>
 
-        {/* Floating elements */}
-        {/* <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-200">
-          <div className="w-3 h-3 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full shadow-lg animate-ping"></div>
-        </div> */}
+  
       </div>
 
       {/* Enhanced Content */}
       <div className="relative p-5 sm:p-6 bg-gradient-to-b from-transparent to-slate-900/50">
-        {/* Subtle pattern overlay */}
-        {/* <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-purple-500 via-transparent to-blue-500"></div>
-         */}
+    
         <div className="relative z-10">
           <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent mb-3 leading-tight tracking-wide group-hover:from-purple-200 group-hover:to-cyan-200 transition-all duration-500">
             {truncateText(data.title, 40)}
@@ -163,11 +163,6 @@ const BookCard = ({ data, favourite, onRemove }) => {
         </div>
       </div>
 
-      
-      {/* <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-2xl"></div>
-      
-  
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm -z-10"></div> */}
     </div>
   );
 };

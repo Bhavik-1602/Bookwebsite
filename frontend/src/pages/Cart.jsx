@@ -25,15 +25,19 @@ const Cart = () => {
     Authorization: `Bearer ${token}`,
   };
 
-  const fetchCart = async () => {
-    try {
-      const res = await axios.get(`http://localhost:3000/api/v1/get-cart/${userId}`, { headers });
-      setCart(res.data.cart || []);
-    } catch (error) {
-      console.error("Error fetching cart:", error.response?.data || error.message);
-      toast.error("Failed to fetch cart data.");
-    }
-  };
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+
+const fetchCart = async () => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/api/v1/get-cart/${userId}`, { headers });
+    setCart(res.data.cart || []);
+  } catch (error) {
+    console.error("Error fetching cart:", error.response?.data || error.message);
+    toast.error("Failed to fetch cart data.");
+  }
+};
+
 
   useEffect(() => {
     fetchCart();
@@ -46,40 +50,37 @@ const Cart = () => {
     }
   }, [cart]);
 
-  const PlaceOrderCOD = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.post(
-        `http://localhost:3000/api/v1/place-order`,
-        {
-          id: userId,
-          order: cart,
-          paymentMode: 'COD',
-          paymentStatus: 'Pending'
-        },
-        { headers }
-      );
 
-      toast.success(response.data.message || "Order placed successfully with COD!");
-      
-      // Navigate directly to order history for COD orders
-      setTimeout(() => {
-        navigate("/profile/orderhistory");
-      }, 1500);
-      
-    } catch (error) {
-      console.error("COD Order error:", error);
-      toast.error("Failed to place COD order");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
+const PlaceOrderCOD = async () => {
+  setIsLoading(true);
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/api/v1/place-order`,
+      {
+        id: userId,
+        order: cart,
+        paymentMode: 'COD',
+        paymentStatus: 'Pending',
+      },
+      { headers }
+    );
+
+    // Handle success (e.g., toast, reset cart, navigate, etc.)
+    toast.success("Order placed successfully!");
+  } catch (error) {
+    console.error("Error placing order:", error.response?.data || error.message);
+    toast.error("Failed to place order.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const PlaceOrderOnline = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        `http://localhost:3000/api/v1/place-order`,
+       const response = await axios.post(
+      `${API_BASE_URL}/api/v1/place-order`,
         {
           id: userId,
           order: cart,
@@ -115,8 +116,8 @@ const Cart = () => {
   const removeFromCart = async (bookId) => {
     setRemovingItems(prev => new Set([...prev, bookId]));
     try {
-      const res = await axios.put(
-        'http://localhost:3000/api/v1/remove-from-cart',
+       const res = await axios.post(
+      `${API_BASE_URL}/api/v1/remove-from-cart`,
         {
           id: userId,
           bookid: bookId,

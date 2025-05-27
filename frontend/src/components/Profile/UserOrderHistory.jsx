@@ -7,9 +7,11 @@ const UserOrderHistory = () => {
   const [orderHistory, setOrderHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
+  
   const userId = localStorage.getItem('userId');
   const token = localStorage.getItem('authToken');
+   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+ 
 
   useEffect(() => {
     const fetchOrderHistory = async () => {
@@ -20,8 +22,7 @@ const UserOrderHistory = () => {
           return;
         }
 
-        const response = await axios.get(
-          `http://localhost:3000/api/v1/order-history/${userId}`,
+        const response = await axios.get(`${API_BASE_URL}/api/v1/order-history/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -15,6 +15,10 @@ const AddBook = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
 
+  // Use Vite environment variables for API configuration
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -73,7 +77,7 @@ const AddBook = () => {
       return;
     }
 
-    // Get token from localStorage (replace with your token logic)
+    // Get token from localStorage
     const token = localStorage.getItem('authToken') || localStorage.getItem('token');
     
     if (!token) {
@@ -98,8 +102,11 @@ const AddBook = () => {
       formDataToSend.append('desc', formData.desc);
       formDataToSend.append('language', formData.language);
 
+      // Construct API URL using environment variables
+      const apiUrl = `${API_BASE_URL}/api/v1/add-book`;
+
       // Make API call
-      const response = await fetch('http://localhost:3000/api/v1/add-book', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

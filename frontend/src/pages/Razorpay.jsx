@@ -7,7 +7,7 @@ const Razorpay = () => {
   const [cartTotal, setCartTotal] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
   useEffect(() => {
     // Get cart total and items from localStorage
     const total = localStorage.getItem("cartTotal");
@@ -61,7 +61,7 @@ const Razorpay = () => {
       const amountInPaise = cartTotal;
       
       // 1. Create order on backend
-      const { data: order } = await axios.post("http://localhost:4000/api/createOrder", {
+      const { data: order } = await axios.post(`${API_BASE_URL}/api/createOrder`, {
         amount: amountInPaise,
         courseId: "book_order_" + Date.now(), // Generate unique order ID
         items: cartItems // Send cart items for reference
@@ -77,7 +77,7 @@ const Razorpay = () => {
         order_id: order.id,
         handler: async function (response) {
           try {
-            const verify = await axios.post("http://localhost:4000/api/verifyPayment", {
+            const verify = await axios.post(`${API_BASE_URL}/api/verifyPayment`, {
               order_id: order.id,
               payment_id: response.razorpay_payment_id,
               signature: response.razorpay_signature,

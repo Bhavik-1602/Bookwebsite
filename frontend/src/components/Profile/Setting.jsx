@@ -9,11 +9,12 @@ const Setting = () => {
 
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("authToken");
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
   // Fetch user profile
   const fetchUserProfile = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/api/v1/get-user-information`, {
+      const response = await axios.get(`${API_BASE_URL}/api/v1/get-user-information`, {
         headers: {
           authorization: `Bearer ${token}`,
         },
@@ -30,7 +31,7 @@ const Setting = () => {
   const updateAddress = async () => {
     try {
       setLoading(true);
-      const response = await axios.put(`http://localhost:3000/api/v1/update-address`, {
+      const response = await axios.put(`${API_BASE_URL}/api/v1/update-address`,  {
         id: userId,
         address: Value.address,
       }, {

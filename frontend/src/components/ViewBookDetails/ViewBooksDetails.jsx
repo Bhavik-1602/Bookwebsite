@@ -18,6 +18,8 @@ const ViewBooksDetails = () => {
   const [isLoadingCart, setIsLoadingCart] = useState(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState(false);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const role = useSelector((state) => state.auth.role);
 useEffect(() => {
@@ -30,7 +32,7 @@ useEffect(() => {
   const fetchBook = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:3000/api/v1/all-book-byid/${id}`);
+     const res = await axios.get(`${API_BASE_URL}/api/v1/all-book-byid/${id}`);
       console.log("Full response:", res.data); // 🔍 Debug here
       setBook(res.data.book); // ✅ Adjust based on actual response
     } catch (error) {
@@ -66,8 +68,7 @@ useEffect(() => {
     try {
       const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("authToken");
-      await axios.put(
-        "http://localhost:3000/api/v1/add-book-to-favourites",
+      await axios.put(`${API_BASE_URL}/api/v1/add-book-to-favourites`,
         { bookid: id, id: userId },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -87,8 +88,7 @@ useEffect(() => {
     try {
       const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("authToken");
-      const res = await axios.put(
-        "http://localhost:3000/api/v1/add-to-cart",
+     const res = await axios.put(`${API_BASE_URL}/api/v1/add-to-cart`, 
         { bookid: id, id: userId },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -111,7 +111,7 @@ useEffect(() => {
     const token = localStorage.getItem('authToken');
 
     try {
-      await axios.delete(`http://localhost:3000/api/v1/delete-book`, {
+      await axios.delete(`${API_BASE_URL}/api/v1/delete-book`, {
         headers: { Authorization: `Bearer ${token}` },
         data: { bookid: id },
       });

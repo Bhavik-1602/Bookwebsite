@@ -9,6 +9,9 @@ import 'react-toastify/dist/ReactToastify.css';
 const SignUp = () => {
   const navigate = useNavigate();
 
+
+   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+ 
   const formik = useFormik({
     initialValues: {
       username: '',
@@ -24,8 +27,8 @@ const SignUp = () => {
     }),
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        const res = await axios.post('http://localhost:3000/api/v1/sign-up', values);
-        toast.success('Registration successful!');
+       const apiUrl = `${API_BASE_URL}/api/v1/sign-up`;
+        const res = await axios.post(apiUrl, values);
         navigate('/signin');
       } catch (error) {
         toast.error(error.response?.data?.message || 'Something went wrong');

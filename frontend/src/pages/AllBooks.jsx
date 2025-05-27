@@ -11,20 +11,27 @@ const AllBooks = () => {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
 
+ 
+
+
   // Fetch all books from your backend
-  const fetchBooks = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get('http://localhost:3000/api/v1/all-books');
-      const booksData = res.data.books || [];
-      setBooks(booksData);
-      setFilteredBooks(booksData);
-    } catch (error) {
-      console.error('Error fetching books:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+
+const fetchBooks = async () => {
+  try {
+    setLoading(true);
+    const res = await axios.get(`${API_BASE_URL}/api/v1/all-books`);
+    const booksData = res.data.books || [];
+    setBooks(booksData);
+    setFilteredBooks(booksData);
+  } catch (error) {
+    console.error('Error fetching books:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Filter books based on search query
   const filterBooks = (query) => {

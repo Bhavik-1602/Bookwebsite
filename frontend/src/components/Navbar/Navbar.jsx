@@ -12,6 +12,9 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+   
+
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
   // Logout handler
   const handleLogout = () => {
@@ -45,7 +48,9 @@ const Navbar = () => {
   // Fetch suggestions from your API
   const fetchSuggestions = async (query) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/v1/all-books?search=${encodeURIComponent(query)}`);
+      const response = await fetch(
+  `${API_BASE_URL}/api/v1/all-books?search=${encodeURIComponent(query)}`
+);
       const data = await response.json();
       setSuggestions(data.books || []);
     } catch (error) {

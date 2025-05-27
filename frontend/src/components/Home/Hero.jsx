@@ -16,10 +16,7 @@ const Hero = () => {
         
         {/* Text Content */}
         <div className='w-full md:w-1/2 flex flex-col justify-center items-center md:items-start text-center md:text-left'>
-          {/* <div className='mb-4 px-4 py-2 bg-yellow-100/10 backdrop-blur-sm border border-yellow-100/20 rounded-full'>
-            <span className='text-yellow-100 text-sm font-medium'>📚 Premium Book Collection</span>
-          </div> */}
-          
+        
           <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-100 via-yellow-200 to-amber-200 leading-tight mb-2'>
             Discover Your Next
             <span className='block text-yellow-100 drop-shadow-lg'>Great Read</span>

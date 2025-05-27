@@ -7,10 +7,13 @@ const AllOrders = () => {
   const [totalPages, setTotalPages] = useState(1);
   const token = localStorage.getItem('authToken');
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+
   useEffect(() => {
     const fetchAllOrders = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/api/v1/all-orders', {
+         const res = await axios.get(`${API_BASE_URL}/api/v1/all-orders`, {
           params: {
             page: currentPage,
             limit: 5,
