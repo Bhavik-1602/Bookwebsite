@@ -44,6 +44,9 @@ const Sidebar = ({ data }) => {
             <Link to="/profile" className="text-zinc-100 font-semibold w-full py-2 mt-4 text-center hover:bg-gray-800 rounded transition-all duration-300">
               All Orders
             </Link>
+              <Link to="/profile/notificationcard" className="text-zinc-100 font-semibold w-full py-2 mt-4 text-center hover:bg-gray-800 rounded transition-all duration-300">
+               add notification
+            </Link>
           </>
         )}
       </div>
